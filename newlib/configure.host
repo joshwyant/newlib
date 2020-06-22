@@ -511,6 +511,10 @@ case "${host}" in
   moxie*)
         sys_dir=
         ;;
+  i[3-7]86-*-myos*)
+    sys_dir=myos
+	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED"
+    ;;
   nios2*)
 	sys_dir=
 	;;

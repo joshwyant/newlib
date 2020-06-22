@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Based on: https://wiki.osdev.org/Porting_Newlib
+
+DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get upgrade -y
+DEBIAN_FRONTEND=noninteractive apt install wget autoconf automake -y
+
+export PREFIX="$(pwd)"
+
+# Download autotools
+wget https://ftp.gnu.org/gnu/automake/automake-1.11.tar.gz
+wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.65.tar.gz
+tar xvf automake-1.11.tar.gz
+tar xvf autoconf-2.65.tar.gz
+
+# Build autotools
+mkdir build-autotools
+cd build-autotools
+
+../automake-1.11/configure --prefix="$PREFIX"
+make && make install
+
+../autoconf-2.65/configure --prefix="$PREFIX"
+make && make install

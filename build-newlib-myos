@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Based on: https://wiki.osdev.org/Porting_Newlib
+
+export PREFIX="$(pwd)"
+export SYSROOT=/usr/local/cross
+
+# Put autotools in the path
+export PATH="$PREFIX/bin:$PATH"
+
+# Hack: bootstrap by first aliasing i686-elf to i686-myos
+# TODO: Remove after OS-specific toolchain installed
+pushd /usr/local/cross/bin
+ln i686-elf-ar i686-myos-ar
+ln i686-elf-as i686-myos-as
+ln i686-elf-gcc i686-myos-gcc
+ln i686-elf-gcc i686-myos-cc
+ln i686-elf-ranlib i686-myos-ranlib
+ln i686-elf-readelf i686-myos-readelf
+popd
+
+# Configure MyOS-related changes in Newlib
+cd newlib-2.5.0/newlib/libc/sys
+autoconf
+
+cd myos
+autoreconf
+
+# Configure and install newlib
+mkdir "$PREFIX/build-newlib"
+cd "$PREFIX/build-newlib"
+../newlib-2.5.0/configure --prefix=/ --target=i686-myos --enable-newlib-io-long-long
+make all
+make DESTDIR=${SYSROOT} install
+cp -ar $SYSROOT/i686-myos/* $SYSROOT
